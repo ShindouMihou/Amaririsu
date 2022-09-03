@@ -2,17 +2,23 @@ package pw.mihou.parsers.modules
 
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
+import pw.mihou.extensions.get
 import pw.mihou.extensions.getFirstElementWithClass
+import pw.mihou.extensions.matchOrThrow
 import pw.mihou.models.user.UserMini
 import pw.mihou.models.series.Series
 import pw.mihou.models.series.statistics.SeriesRatingStatistic
 import pw.mihou.models.series.statistics.SeriesStatistics
 import pw.mihou.models.series.statistics.SeriesUserStatistics
 import pw.mihou.parsers.Parser
+import pw.mihou.regexes.AmaririsuRegexes
 
 object SeriesParser: Parser<Series> {
 
     override fun from(url: String, document: Document): Series {
+        val matcher = AmaririsuRegexes.SERIES_LINK_REGEX.matchOrThrow(url)
+        val id = matcher["id"]!!.toInt()
+
         val authorHref = document.selectFirst(".author > div[property=\"author\"] > span > a")!!
 
         var views: String? = null
@@ -48,6 +54,7 @@ object SeriesParser: Parser<Series> {
         val userStatisticsElement = document.getFirstElementWithClass("statUser")!!
 
         return Series(
+            id = id,
             name = document.getFirstElementWithClass("fic_title")!!
                 .text(),
             cover = document.selectFirst(".novel-cover > .fic_image > img")!!
@@ -59,6 +66,9 @@ object SeriesParser: Parser<Series> {
                 name = authorHref.getFirstElementWithClass("auth_name_fic")!!
                     .text(),
                 url = authorHref.attr("abs:href"),
+                id = AmaririsuRegexes.USER_LINK_REGEX
+                    .matchOrThrow(authorHref.attr("abs:href"))["id"]!!
+                    .toInt(),
                 avatar = document.selectFirst("div.fic_useravatar > img")!!
                     .attr("abs:src")
             ),

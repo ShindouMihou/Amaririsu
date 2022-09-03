@@ -7,7 +7,6 @@ import pw.mihou.cache.Cacheable
 import pw.mihou.models.SearchResult
 import pw.mihou.models.series.Series
 import pw.mihou.parsers.modules.SeriesParser
-import pw.mihou.regexes.AmaririsuRegexes
 
 object Amaririsu {
 
@@ -33,15 +32,12 @@ object Amaririsu {
      *
      * @param url the link to the series.
      * @return an instance of the series.
-     * @throws IllegalArgumentException when the link  doesn't match the [AmaririsuRegexes.SERIES_LINK_REGEX].
      */
-    fun series(url: String): Series = run {
-        match(content = url, regex = AmaririsuRegexes.SERIES_LINK_REGEX)
-        cache(url = url,
-            otherwise = { SeriesParser.from(url, connector(url)) },
-            validator = { cacheable -> cacheable is Series }
-        ) as Series
-    }
+    fun series(url: String): Series = cache(
+        url = url,
+        otherwise = { SeriesParser.from(url, connector(url)) },
+        validator = { cacheable -> cacheable is Series }
+    ) as Series
 
     /**
      * Searches the name whether as series or user using the search engine of ScribbleHub.
@@ -51,19 +47,6 @@ object Amaririsu {
     fun search(name: String): SearchResult {
         // TODO: Implement this search method.
         throw UnsupportedOperationException("Searching is not supported at this moment.")
-    }
-
-    /**
-     * Ensures the given content can be matched by the given regex otherwise throws an xception.
-     *
-     * @param content the content that must match the regex.
-     * @param regex the regex to match the content.
-     * @throws IllegalArgumentException when the content doesn't match the regex.
-     */
-    private fun match(content: String, regex: Regex) {
-        if (!content.matches(regex)) {
-            throw IllegalArgumentException("$content cannot be matched by the regex ($regex)!")
-        }
     }
 
     /**
@@ -77,7 +60,7 @@ object Amaririsu {
      */
     private fun cache(url: String, otherwise: (String) -> Cacheable, validator: (Cacheable) -> Boolean): Cacheable {
         synchronized(url) {
-            val cached = cache!!.get(url)
+            val cached = cache?.get(url)
 
             if (cached != null && validator(cached)) {
                 return cached
