@@ -2,6 +2,7 @@ package pw.mihou.parsers.modules
 
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
+import pw.mihou.exceptions.SeriesNotFoundException
 import pw.mihou.extensions.get
 import pw.mihou.extensions.getFirstElementWithClass
 import pw.mihou.extensions.matchOrThrow
@@ -16,6 +17,10 @@ import pw.mihou.regexes.AmaririsuRegexes
 object SeriesParser: Parser<Series> {
 
     override fun from(url: String, document: Document): Series {
+        if (document.getFirstElementWithClass("error_msg_404") != null) {
+            throw SeriesNotFoundException(url)
+        }
+
         val matcher = AmaririsuRegexes.SERIES_LINK_REGEX.matchOrThrow(url)
         val id = matcher["id"]!!.toInt()
 

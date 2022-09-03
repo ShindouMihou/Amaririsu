@@ -8,6 +8,11 @@ import pw.mihou.models.SearchResult
 import pw.mihou.models.series.Series
 import pw.mihou.parsers.modules.SeriesParser
 import pw.mihou.regexes.AmaririsuRegexes
+import pw.mihou.exceptions.SeriesNotFoundException
+import pw.mihou.exceptions.DisabledUserException
+import pw.mihou.exceptions.UserNotFoundException
+import pw.mihou.models.user.User
+import pw.mihou.parsers.modules.UserParser
 
 object Amaririsu {
 
@@ -34,6 +39,7 @@ object Amaririsu {
      * @param url the link to the series.
      * @return an instance of the series.
      * @throws IllegalArgumentException when the link  doesn't match the [AmaririsuRegexes.SERIES_LINK_REGEX].
+     * @throws SeriesNotFoundException when ScribbleHub returns a 404 page.
      */
     fun series(url: String): Series = run {
         match(content = url, regex = AmaririsuRegexes.SERIES_LINK_REGEX)
@@ -42,6 +48,25 @@ object Amaririsu {
             otherwise = { SeriesParser.from(url, connector(url)) },
             validator = { cacheable -> cacheable is Series }
         ) as Series
+    }
+
+    /**
+     * Gets from the cache if available or requests information of the user given a link before
+     * caching the user when the cache is available.
+     *
+     * @param url the link to the user.
+     * @return an instance of the user.
+     * @throws IllegalArgumentException when the link  doesn't match the [AmaririsuRegexes.USER_LINK_REGEX].
+     * @throws UserNotFoundException when ScribbleHub throws an error because the user cannot be found.
+     * @throws DisabledUserException when ScribbleHub throws an error because the user's profile is disabled.
+     */
+    fun user(url: String): User = run {
+        match(content = url, regex = AmaririsuRegexes.USER_LINK_REGEX)
+        cache(
+            url = url,
+            otherwise = { UserParser.from(url, connector(url)) },
+            validator = { cacheable -> cacheable is User }
+        ) as User
     }
 
     /**
