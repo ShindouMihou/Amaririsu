@@ -1,5 +1,6 @@
 package pw.mihou.models.series
 
+import pw.mihou.Amaririsu
 import pw.mihou.models.series.statistics.SeriesStatistics
 
 data class SeriesSearchResult(
@@ -11,4 +12,6 @@ data class SeriesSearchResult(
     val genres: Set<String>,
     val statistics: SeriesStatistics,
     val author: SeriesSearchResultAuthor
-)
+) {
+    fun expand(): Series = Amaririsu.series(url)
+}
