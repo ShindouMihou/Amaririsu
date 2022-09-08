@@ -6,7 +6,7 @@ import pw.mihou.exceptions.SeriesNotFoundException
 import pw.mihou.extensions.get
 import pw.mihou.extensions.getFirstElementWithClass
 import pw.mihou.extensions.matchOrThrow
-import pw.mihou.models.user.UserMini
+import pw.mihou.models.user.UserResultOrAuthor
 import pw.mihou.models.series.Series
 import pw.mihou.models.series.statistics.SeriesRatingStatistic
 import pw.mihou.models.series.statistics.SeriesStatistics
@@ -82,7 +82,7 @@ object SeriesParser: Parser<Series, SeriesOptions> {
                 .attr("abs:src"),
             synopsis = synopsis,
             url = url,
-            author = UserMini(
+            author = UserResultOrAuthor(
                 name = authorHref.getFirstElementWithClass("auth_name_fic")!!
                     .text(),
                 url = authorHref.attr("abs:href"),

@@ -1,7 +1,7 @@
 package pw.mihou.models.series
 
 import pw.mihou.cache.Cacheable
-import pw.mihou.models.user.UserMini
+import pw.mihou.models.user.UserResultOrAuthor
 import pw.mihou.models.series.statistics.SeriesStatistics
 import pw.mihou.models.series.statistics.SeriesUserStatistics
 
@@ -11,7 +11,7 @@ data class Series(
     val url: String,
     val cover: String,
     val synopsis: String,
-    val author: UserMini,
+    val author: UserResultOrAuthor,
     val statistics: SeriesStatistics,
     val genres: Set<String>,
     val tags: Set<String>,
