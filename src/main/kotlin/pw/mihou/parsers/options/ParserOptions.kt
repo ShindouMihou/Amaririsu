@@ -1,3 +1,8 @@
 package pw.mihou.parsers.options
 
-interface ParserOptions
+import org.jsoup.nodes.Document
+import pw.mihou.Amaririsu
+
+abstract class ParserOptions {
+    var connector: (url: String) -> Document = Amaririsu.connector
+}

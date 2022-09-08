@@ -14,7 +14,7 @@ import pw.mihou.exceptions.UserNotFoundException
 import pw.mihou.models.user.User
 import pw.mihou.parsers.modules.SearchParser
 import pw.mihou.parsers.modules.UserParser
-import pw.mihou.parsers.options.SearchOptions
+import pw.mihou.parsers.options.modules.SearchOptions
 import java.net.URLEncoder
 
 object Amaririsu {
@@ -96,7 +96,7 @@ object Amaririsu {
 
         cache(
             url = "https://www.scribblehub.com/?s=${URLEncoder.encode(name, "utf-8")}&post_type=fictionposts" + additionalParameters,
-            otherwise = { SearchParser.from(it, connector(it), searchOptions) },
+            otherwise = { SearchParser.from(it, searchOptions.connector(it), searchOptions) },
             validator = { cacheable -> cacheable is SearchResult }
         ) as SearchResult
     }

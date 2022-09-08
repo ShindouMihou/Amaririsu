@@ -7,7 +7,7 @@ import pw.mihou.models.user.UserMini
 import pw.mihou.parsers.Parser
 import pw.mihou.parsers.modules.search.SeriesNodeParser
 import pw.mihou.parsers.modules.search.UserNodeParser
-import pw.mihou.parsers.options.SearchOptions
+import pw.mihou.parsers.options.modules.SearchOptions
 
 object SearchParser: Parser<SearchResult, SearchOptions> {
 
