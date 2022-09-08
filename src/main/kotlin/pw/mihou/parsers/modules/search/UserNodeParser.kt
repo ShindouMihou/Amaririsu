@@ -7,11 +7,12 @@ import pw.mihou.extensions.getFirstElementWithClass
 import pw.mihou.extensions.matchOrThrow
 import pw.mihou.models.user.UserResultOrAuthor
 import pw.mihou.parsers.NodeParser
+import pw.mihou.parsers.options.modules.SearchOptions
 import pw.mihou.regexes.AmaririsuRegexes
 
-object UserNodeParser: NodeParser<UserResultOrAuthor> {
+object UserNodeParser: NodeParser<UserResultOrAuthor, SearchOptions> {
 
-    override fun from(document: Document, element: Element): UserResultOrAuthor {
+    override fun from(document: Document, element: Element, options: SearchOptions): UserResultOrAuthor {
         val link = element.attr("abs:href")
         val matcher = AmaririsuRegexes.USER_LINK_REGEX.matchOrThrow(link)
         val id = matcher["id"]!!.toInt()
@@ -21,10 +22,16 @@ object UserNodeParser: NodeParser<UserResultOrAuthor> {
             .getElementsByTag("img")
             .first()!!
 
+        var avatar = imageElement.attr("abs:src")
+
+        if (options.user.largeAvatars) {
+            avatar = avatar.replaceFirst("/s/", "/l/")
+        }
+
         return UserResultOrAuthor(
             id = id,
             name = imageElement.attr("alt"),
-            avatar = imageElement.attr("abs:src"),
+            avatar = avatar,
             link
         )
     }

@@ -10,11 +10,12 @@ import pw.mihou.models.series.SeriesSearchResultAuthor
 import pw.mihou.models.series.statistics.SeriesRatingStatistic
 import pw.mihou.models.series.statistics.SeriesStatistics
 import pw.mihou.parsers.NodeParser
+import pw.mihou.parsers.options.modules.SearchOptions
 import pw.mihou.regexes.AmaririsuRegexes
 
-object SeriesNodeParser: NodeParser<SeriesSearchResult> {
+object SeriesNodeParser: NodeParser<SeriesSearchResult, SearchOptions> {
 
-    override fun from(document: Document, element: Element): SeriesSearchResult {
+    override fun from(document: Document, element: Element, options: SearchOptions): SeriesSearchResult {
         val cover = element.getFirstElementWithClass("search_img")!!
             .child(0)
             .getElementsByTag("img")

@@ -89,11 +89,11 @@ object Amaririsu {
         prepareOptions(SearchOptions(), options) { searchOptions ->
             val additionalParameters = run lookingAt@{
                 var builder = ""
-                if (searchOptions.includeSeries) {
+                if (searchOptions.series.enabled) {
                     builder += "&amelia_looking_at=series"
                 }
 
-                if (searchOptions.includeUsers) {
+                if (searchOptions.user.enabled) {
                     builder += "&amelia_looking_at=users"
                 }
 

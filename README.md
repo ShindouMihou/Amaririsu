@@ -64,6 +64,6 @@ understand the need or use for the method.
 > 
 > ```kotlin
 > Amaririsu.search("Mihou") { 
->   includeSeries = false
+>   series.enabled = false
 > }
 > ```

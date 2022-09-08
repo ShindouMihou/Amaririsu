@@ -15,15 +15,15 @@ object SearchParser: Parser<SearchResult, SearchOptions> {
         val users: MutableSet<UserResultOrAuthor> = mutableSetOf()
         val series: MutableSet<SeriesSearchResult> = mutableSetOf()
 
-        if (options.includeSeries) {
+        if (options.series.enabled) {
             document.select(".search_main_box").forEach { element ->
-                series.add(SeriesNodeParser.from(document, element))
+                series.add(SeriesNodeParser.from(document, element, options))
             }
         }
 
-        if (options.includeUsers) {
+        if (options.user.enabled) {
             document.select(".sb_box > .s_user_link").forEach { element ->
-                users.add(UserNodeParser.from(document, element))
+                users.add(UserNodeParser.from(document, element, options))
             }
         }
 

@@ -47,7 +47,7 @@ class AmaririsuTest {
     @Test
     fun searchResultSeries() {
         val results = Amaririsu.search("The Vampire") {
-            includeUsers = false
+            user.enabled = false
         }
 
         assertEquals(false, results.series.isEmpty())
@@ -58,7 +58,7 @@ class AmaririsuTest {
     @Test
     fun searchResultUser() {
         val results = Amaririsu.search("Miho") {
-            includeSeries = false
+            series.enabled = false
         }
 
         assertEquals(false, results.users.isEmpty())
