@@ -14,7 +14,10 @@ import pw.mihou.exceptions.UserNotFoundException
 import pw.mihou.models.user.User
 import pw.mihou.parsers.modules.SearchParser
 import pw.mihou.parsers.modules.UserParser
+import pw.mihou.parsers.options.ParserOptions
 import pw.mihou.parsers.options.modules.SearchOptions
+import pw.mihou.parsers.options.modules.SeriesOptions
+import pw.mihou.parsers.options.modules.UserOptions
 import java.net.URLEncoder
 
 object Amaririsu {
@@ -44,13 +47,16 @@ object Amaririsu {
      * @throws IllegalArgumentException when the link  doesn't match the [AmaririsuRegexes.SERIES_LINK_REGEX].
      * @throws SeriesNotFoundException when ScribbleHub returns a 404 page.
      */
-    fun series(url: String): Series = run {
+    fun series(url: String, options: SeriesOptions.() -> Unit = {}): Series = run {
         match(content = url, regex = AmaririsuRegexes.SERIES_LINK_REGEX)
-        cache(
-            url = url,
-            otherwise = { SeriesParser.from(url, connector(url)) },
-            validator = { cacheable -> cacheable is Series }
-        ) as Series
+
+        prepareOptions(SeriesOptions(), options) { seriesOptions ->
+            cache(
+                url = url,
+                otherwise = { SeriesParser.from(url, seriesOptions.connector(url), seriesOptions) },
+                validator = { cacheable -> cacheable is Series }
+            ) as Series
+        }
     }
 
     /**
@@ -63,13 +69,15 @@ object Amaririsu {
      * @throws UserNotFoundException when ScribbleHub throws an error because the user cannot be found.
      * @throws DisabledUserException when ScribbleHub throws an error because the user's profile is disabled.
      */
-    fun user(url: String): User = run {
+    fun user(url: String, options: UserOptions.() -> Unit = {}): User = run {
         match(content = url, regex = AmaririsuRegexes.USER_LINK_REGEX)
-        cache(
-            url = url,
-            otherwise = { UserParser.from(url, connector(url)) },
-            validator = { cacheable -> cacheable is User }
-        ) as User
+        prepareOptions(UserOptions(), options) { userOptions ->
+            cache(
+                url = url,
+                otherwise = { UserParser.from(url, userOptions.connector(url), userOptions) },
+                validator = { cacheable -> cacheable is User }
+            ) as User
+        }
     }
 
     /**
@@ -78,27 +86,28 @@ object Amaririsu {
      * @return the search results.
      */
     fun search(name: String, options: SearchOptions.() -> Unit = {}): SearchResult = run {
-        val searchOptions = SearchOptions()
-        options(searchOptions)
+        prepareOptions(SearchOptions(), options) { searchOptions ->
+            val additionalParameters = run lookingAt@{
+                var builder = ""
+                if (searchOptions.includeSeries) {
+                    builder += "&amelia_looking_at=series"
+                }
 
-        val additionalParameters = run lookingAt@{
-            var builder = ""
-            if (searchOptions.includeSeries) {
-                builder += "&amelia_looking_at=series"
+                if (searchOptions.includeUsers) {
+                    builder += "&amelia_looking_at=users"
+                }
+
+                builder
             }
 
-            if (searchOptions.includeUsers) {
-                builder += "&amelia_looking_at=users"
-            }
+            val search = URLEncoder.encode(name, Charsets.UTF_8)
 
-            builder
+            cache(
+                url = "https://www.scribblehub.com/?s=$search&post_type=fictionposts$additionalParameters",
+                otherwise = { SearchParser.from(it, searchOptions.connector(it), searchOptions) },
+                validator = { cacheable -> cacheable is SearchResult }
+            ) as SearchResult
         }
-
-        cache(
-            url = "https://www.scribblehub.com/?s=${URLEncoder.encode(name, "utf-8")}&post_type=fictionposts" + additionalParameters,
-            otherwise = { SearchParser.from(it, searchOptions.connector(it), searchOptions) },
-            validator = { cacheable -> cacheable is SearchResult }
-        ) as SearchResult
     }
 
     /**
@@ -112,6 +121,20 @@ object Amaririsu {
         if (!content.matches(regex)) {
             throw IllegalArgumentException("$content cannot be matched by the regex ($regex)!")
         }
+    }
+
+    /**
+     * Applies the modifier to the given options .
+     *
+     * @param reference the reference option object.
+     * @param modifier the modifier to modify the options object.
+     * @param continuation the continued effect.
+     * @return the result from the continuation.
+     */
+    private fun <Option:ParserOptions, Result> prepareOptions(reference: Option, modifier: Option.() -> Unit,
+                                               continuation: (options: Option) -> Result): Result {
+        modifier(reference)
+        return continuation(reference)
     }
 
     /**

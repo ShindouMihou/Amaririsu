@@ -17,6 +17,25 @@ class AmaririsuTest {
     }
 
     @Test
+    fun seriesMinified() {
+        val series = Amaririsu.series("https://www.scribblehub.com/series/299262/the-vampire-empress/") {
+            includeSynopsis = false
+            includeGenres = false
+            includeTags = false
+        }
+
+        println("Trace:\n$series")
+
+        assertEquals(299262, series.id)
+
+        assertEquals("The Vampire Empress", series.name)
+        assertEquals("Mihou", series.author.name)
+        assertEquals("", series.synopsis)
+        assertEquals(true, series.genres.isEmpty())
+        assertEquals(true, series.tags.isEmpty())
+    }
+
+    @Test
     fun user() {
         val user = Amaririsu.user("https://www.scribblehub.com/profile/24680/mihou/")
         println("Trace:\n$user")

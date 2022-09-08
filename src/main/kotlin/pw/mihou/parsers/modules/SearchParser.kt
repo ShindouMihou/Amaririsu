@@ -11,19 +11,17 @@ import pw.mihou.parsers.options.modules.SearchOptions
 
 object SearchParser: Parser<SearchResult, SearchOptions> {
 
-    override fun from(url: String, document: Document, options: SearchOptions?): SearchResult {
+    override fun from(url: String, document: Document, options: SearchOptions): SearchResult {
         val users: MutableSet<UserMini> = mutableSetOf()
         val series: MutableSet<SeriesSearchResult> = mutableSetOf()
 
-        val safeOptions = options ?: SearchOptions()
-
-        if (safeOptions.includeSeries) {
+        if (options.includeSeries) {
             document.select(".search_main_box").forEach { element ->
                 series.add(SeriesNodeParser.from(document, element))
             }
         }
 
-        if (safeOptions.includeUsers) {
+        if (options.includeUsers) {
             document.select(".sb_box > .s_user_link").forEach { element ->
                 users.add(UserNodeParser.from(document, element))
             }

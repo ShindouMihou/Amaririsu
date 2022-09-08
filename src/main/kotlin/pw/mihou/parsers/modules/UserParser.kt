@@ -16,7 +16,7 @@ import java.io.IOException
 
 object UserParser: Parser<User, ParserOptions> {
 
-    override fun from(url: String, document: Document, options: ParserOptions?): User {
+    override fun from(url: String, document: Document, options: ParserOptions): User {
         val matcher = AmaririsuRegexes.USER_LINK_REGEX.matchOrThrow(url)
         val id = matcher["id"]!!.toInt()
 

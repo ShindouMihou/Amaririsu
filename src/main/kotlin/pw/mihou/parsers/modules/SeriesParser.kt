@@ -12,12 +12,12 @@ import pw.mihou.models.series.statistics.SeriesRatingStatistic
 import pw.mihou.models.series.statistics.SeriesStatistics
 import pw.mihou.models.series.statistics.SeriesUserStatistics
 import pw.mihou.parsers.Parser
-import pw.mihou.parsers.options.ParserOptions
+import pw.mihou.parsers.options.modules.SeriesOptions
 import pw.mihou.regexes.AmaririsuRegexes
 
-object SeriesParser: Parser<Series, ParserOptions> {
+object SeriesParser: Parser<Series, SeriesOptions> {
 
-    override fun from(url: String, document: Document, options: ParserOptions?): Series {
+    override fun from(url: String, document: Document, options: SeriesOptions): Series {
         if (document.getFirstElementWithClass("error_msg_404") != null) {
             throw SeriesNotFoundException(url)
         }
@@ -59,14 +59,28 @@ object SeriesParser: Parser<Series, ParserOptions> {
         val ratingElement = document.selectFirst("#chk_ficrate > #ratefic_user > span")!!.getElementsByTag("span")
         val userStatisticsElement = document.getFirstElementWithClass("statUser")!!
 
+        val synopsis =
+            if (options.includeSynopsis) document.select(".wi_fic_desc").joinToString("\n") { it.text() }
+            else ""
+
+        val genres =
+            if (options.includeGenres) document.select(".wi_fic_genre > span[property=\"genre\"] > a")
+                .map { it.text() }
+                .toHashSet()
+            else emptySet()
+
+        val tags = if (options.includeTags) document.select(".wi_fic_showtags > .wi_fic_showtags_inner > a")
+            .map { it.text() }
+            .toHashSet()
+        else emptySet()
+
         return Series(
             id = id,
             name = document.getFirstElementWithClass("fic_title")!!
                 .text(),
             cover = document.selectFirst(".novel-cover > .fic_image > img")!!
                 .attr("abs:src"),
-            synopsis = document.select(".wi_fic_desc")
-                .joinToString("\n") { it.text() },
+            synopsis = synopsis,
             url = url,
             author = UserMini(
                 name = authorHref.getFirstElementWithClass("auth_name_fic")!!
@@ -78,12 +92,8 @@ object SeriesParser: Parser<Series, ParserOptions> {
                 avatar = document.selectFirst("div.fic_useravatar > img")!!
                     .attr("abs:src")
             ),
-            genres = document.select(".wi_fic_genre > span[property=\"genre\"] > a")
-                .map { it.text() }
-                .toHashSet(),
-            tags = document.select(".wi_fic_showtags > .wi_fic_showtags_inner > a")
-                .map { it.text() }
-                .toHashSet(),
+            genres = genres,
+            tags = tags,
             statistics = SeriesStatistics(
                 views!!,
                 favorites!!,
