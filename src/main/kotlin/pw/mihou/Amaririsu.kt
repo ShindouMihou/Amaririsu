@@ -12,7 +12,9 @@ import pw.mihou.exceptions.SeriesNotFoundException
 import pw.mihou.exceptions.DisabledUserException
 import pw.mihou.exceptions.UserNotFoundException
 import pw.mihou.models.user.User
+import pw.mihou.parsers.modules.SearchParser
 import pw.mihou.parsers.modules.UserParser
+import java.net.URLEncoder
 
 object Amaririsu {
 
@@ -74,10 +76,11 @@ object Amaririsu {
      * @param name the name to search.
      * @return the search results.
      */
-    fun search(name: String): SearchResult {
-        // TODO: Implement this search method.
-        throw UnsupportedOperationException("Searching is not supported at this moment.")
-    }
+    fun search(name: String): SearchResult = cache(
+        url = "https://www.scribblehub.com/?s=${URLEncoder.encode(name, "utf-8")}&post_type=fictionposts",
+        otherwise = { SearchParser.from(it, connector(it)) },
+        validator = { cacheable -> cacheable is SearchResult }
+    ) as SearchResult
 
     /**
      * Ensures the given content can be matched by the given regex otherwise throws an exception.

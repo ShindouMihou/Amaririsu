@@ -25,4 +25,20 @@ class AmaririsuTest {
         assertEquals("Mihou", user.name)
     }
 
+    @Test
+    fun searchResultSeries() {
+        val results = Amaririsu.search("The Vampire")
+
+        assertEquals(false, results.series.isEmpty())
+        println("Trace:\n${results.series}")
+    }
+
+    @Test
+    fun searchResultUser() {
+        val results = Amaririsu.search("Miho")
+
+        assertEquals(false, results.users.isEmpty())
+        println("Trace:\n${results.users}")
+    }
+
 }
