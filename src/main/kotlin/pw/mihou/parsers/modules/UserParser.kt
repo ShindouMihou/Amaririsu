@@ -10,12 +10,13 @@ import pw.mihou.models.user.User
 import pw.mihou.models.user.statistics.AuthorStatistics
 import pw.mihou.models.user.statistics.UserStatistics
 import pw.mihou.parsers.Parser
+import pw.mihou.parsers.options.ParserOptions
 import pw.mihou.regexes.AmaririsuRegexes
 import java.io.IOException
 
-object UserParser: Parser<User> {
+object UserParser: Parser<User, ParserOptions> {
 
-    override fun from(url: String, document: Document): User {
+    override fun from(url: String, document: Document, options: ParserOptions?): User {
         val matcher = AmaririsuRegexes.USER_LINK_REGEX.matchOrThrow(url)
         val id = matcher["id"]!!.toInt()
 

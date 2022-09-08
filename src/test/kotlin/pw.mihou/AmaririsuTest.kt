@@ -27,17 +27,23 @@ class AmaririsuTest {
 
     @Test
     fun searchResultSeries() {
-        val results = Amaririsu.search("The Vampire")
+        val results = Amaririsu.search("The Vampire") {
+            includeUsers = false
+        }
 
         assertEquals(false, results.series.isEmpty())
+        assertEquals(true, results.users.isEmpty())
         println("Trace:\n${results.series}")
     }
 
     @Test
     fun searchResultUser() {
-        val results = Amaririsu.search("Miho")
+        val results = Amaririsu.search("Miho") {
+            includeSeries = false
+        }
 
         assertEquals(false, results.users.isEmpty())
+        assertEquals(true, results.series.isEmpty())
         println("Trace:\n${results.users}")
     }
 

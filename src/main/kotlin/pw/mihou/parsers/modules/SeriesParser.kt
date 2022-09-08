@@ -12,11 +12,12 @@ import pw.mihou.models.series.statistics.SeriesRatingStatistic
 import pw.mihou.models.series.statistics.SeriesStatistics
 import pw.mihou.models.series.statistics.SeriesUserStatistics
 import pw.mihou.parsers.Parser
+import pw.mihou.parsers.options.ParserOptions
 import pw.mihou.regexes.AmaririsuRegexes
 
-object SeriesParser: Parser<Series> {
+object SeriesParser: Parser<Series, ParserOptions> {
 
-    override fun from(url: String, document: Document): Series {
+    override fun from(url: String, document: Document, options: ParserOptions?): Series {
         if (document.getFirstElementWithClass("error_msg_404") != null) {
             throw SeriesNotFoundException(url)
         }
