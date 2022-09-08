@@ -19,6 +19,7 @@ import pw.mihou.parsers.options.modules.SearchOptions
 import pw.mihou.parsers.options.modules.SeriesOptions
 import pw.mihou.parsers.options.modules.UserOptions
 import java.net.URLEncoder
+import java.nio.charset.Charset
 
 object Amaririsu {
 
@@ -100,7 +101,7 @@ object Amaririsu {
                 builder
             }
 
-            val search = URLEncoder.encode(name, Charsets.UTF_8)
+            val search = URLEncoder.encode(name, Charset.forName("UTF-8"))
 
             cache(
                 url = "https://www.scribblehub.com/?s=$search&post_type=fictionposts$additionalParameters",
