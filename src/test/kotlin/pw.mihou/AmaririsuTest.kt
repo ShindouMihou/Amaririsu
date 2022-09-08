@@ -8,12 +8,18 @@ class AmaririsuTest {
     @Test
     fun series() {
         val series = Amaririsu.series("https://www.scribblehub.com/series/299262/the-vampire-empress/")
+
+        assertEquals(299262, series.id)
+
         assertEquals("The Vampire Empress", series.name)
+        assertEquals("Mihou", series.author.name)
     }
 
     @Test
     fun user() {
         val user = Amaririsu.user("https://www.scribblehub.com/profile/24680/mihou/")
+
+        assertEquals(24680, user.id)
         assertEquals("Mihou", user.name)
     }
 
