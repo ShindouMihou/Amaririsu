@@ -2,6 +2,7 @@ package pw.mihou
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 class AmaririsuTest {
 
@@ -14,6 +15,11 @@ class AmaririsuTest {
 
         assertEquals("The Vampire Empress", series.name)
         assertEquals("Mihou", series.author.name)
+
+        val completedSeries = Amaririsu.series("https://www.scribblehub.com/series/121768/althea-the-grimoire/")
+        println("Trace:\n$completedSeries")
+
+        assertNotNull(completedSeries.statistics.lastChapterUpdate)
     }
 
     @Test

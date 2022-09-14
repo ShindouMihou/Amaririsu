@@ -111,7 +111,7 @@ object SeriesParser: Parser<Series, SeriesOptions> {
                     .selectFirst(".widget_fic_similar")!!
                     .select("li")
                     .last()!!
-                    .getElementsByTag("span")[2]!!
+                    .selectFirst("span[title^=Last Updated]")!!
                     .attr("title")
                     .removePrefix("Last updated: ")
             ),
